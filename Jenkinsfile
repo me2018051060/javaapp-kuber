@@ -1,19 +1,19 @@
 pipeline {
     environment {
-        imagename = "sathishbob/javaapp-jenkins-training"
+        imagename = "eonshim/javaapp-jenkins-training"
         dockerImage = ''
-        registryCredentials = 'dockerhub'
+        registryCredentials = 'Random!@pass12'
     }
     agent any
     tools {
-        maven "MVN3"
+        maven "mvn3"
         dockerTool "docker"
     }
     
     stages {
         stage("pullscm") {
             steps {
-                git credentialsId: 'github', url: 'git@github.com:sathishbob/javaapp-kuber.git'
+                git credentialsId: 'me2018051060', url: 'git@github.com:me201805160/javaapp-kuber.git'
             }
         }
         stage("build") {
