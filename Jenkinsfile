@@ -1,9 +1,4 @@
 pipeline {
-    environment {
-        imagename = "eonshim/javaapp-jenkins-training"
-        dockerImage = ''
-        registryCredentials = 'Random!@pass12'
-    }
     agent any
     tools {
         maven "mvn3"
@@ -13,7 +8,7 @@ pipeline {
     stages {
         stage("pullscm") {
             steps {
-                git credentialsId: 'me2018051060', url: 'git@github.com:me201805160/javaapp-kuber.git'
+                git credentialsId: 'github', url: 'git@github.com:me201805160/javaapp-kuber.git'
             }
         }
         stage("build") {
@@ -44,10 +39,15 @@ pipeline {
                 sh "docker rmi $imagename"
             }
         }
-        stage("kubedeployment") {
+        stage ('Kube Deployment') {
             steps {
-                sh "sed -i s/latest/$BUILD_NUMBER/g kubernetes-java/deploy.yml"
-                sh "sudo kubectl apply -f kubernetes-java/deploy.yml"
+                script {
+                    withKubeConfig([credentialsId: 'kube-config']) {
+                        sh "sed -i s/latest/$BUILD_NUMBER/g kubernetes-java/deploy.yml"
+                        sh "kubectl apply -f kubernetes-java/deploy.yml"
+                        sh "sleep 10 && kubectl get svc"
+                    }
+                }
             }
         }
     }
